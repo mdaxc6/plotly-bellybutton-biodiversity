@@ -1,4 +1,6 @@
-d3.json("../plotly-challenge/samples.json").then(function(samples){
+var jsonFile = "../plotly-challenge/samples.json"
+
+d3.json(jsonFile).then(function(samples){
     var names = samples.names;
     names.forEach(name => {
         d3.select("#selDataset").append("option").text(name);
@@ -8,19 +10,17 @@ d3.json("../plotly-challenge/samples.json").then(function(samples){
 });
 
 function getSample(samples){
-    var selectNode = d3.select("#selDataset");
-    var sampleID = selectNode.property("value");
+    var sampleID = d3.select("#selDataset").property("value");
     var sampleData = samples["samples"].filter(sample => sample.id == sampleID);
     return sampleData;
 }
 
 function getMeta(samples){
-    var selectNode = d3.select("#selDataset");
-    var sampleID = selectNode.property("value");
+    var sampleID = d3.select("#selDataset").property("value");
     var metadata = samples["metadata"].filter(sample => sample.id == sampleID);
     
     var metaDiv = d3.select("#sample-metadata");
-    console.log(metadata[0])
+    metaDiv.selectAll("p").remove();
     Object.entries(metadata[0]).forEach(([key, value]) => {
         metaDiv.append("p")
             .html(`<b>${key}: ${value}</b>`);
@@ -83,4 +83,14 @@ function init(samples){
     getMeta(samples);
 }
 
-
+function optionChanged(){
+    d3.json(jsonFile).then(samples =>{
+        var barData = plotBar(samples);
+        Plotly.newPlot("bar", barData);
+    
+        var bubbleData = plotBubble(samples);
+        Plotly.newPlot("bubble", bubbleData);
+    
+        getMeta(samples);
+    });
+}
