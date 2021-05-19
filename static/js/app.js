@@ -7,6 +7,10 @@ d3.json("../plotly-challenge/samples.json").then(function(samples){
     init(samples);
 });
 
+// numArray.sort(function compareFunction(firstNum, secondNum) {
+//     // resulting order is (3, 2, 1)
+//     return secondNum - firstNum;
+//   });
 
 function plotData(samples){
     var selectNode = d3.select("#selDataset");
@@ -15,15 +19,20 @@ function plotData(samples){
 
     var sampleData = samples["samples"].filter(sample => sample.id == sampleID);
 
-    console.log(sampleData[0].otu_ids.slice(0,10).toString());
-
-    var yData = sampleData[0].otu_ids.slice(0,10).forEach(id => `OTU ${toString(id)}`);
+    var yData = sampleData[0].otu_ids.slice(0,10);
+    var yLabels = [];
 
     console.log(yData)
 
+    yData.forEach(function(sample){
+        yLabels.push(`OTU ${sample.toString()}`);
+    });
+
+    console.log(yLabels)
+
     var trace = {
-        x: sampleData[0].sample_values.slice(0,10),
-        y: yData,
+        x: sampleData[0].sample_values.slice(0,10).reverse(),
+        y: yLabels.reverse(),
         text: sampleData[0].otu_labels.slice(0,10),
         type: "bar",
         orientation: "h"
@@ -37,7 +46,6 @@ function plotData(samples){
 
 function init(samples){
     var chartData = plotData(samples);
-    var layout = {tickmode: "array"}
     Plotly.newPlot("bar", chartData);
 }
 
