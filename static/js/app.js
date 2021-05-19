@@ -1,5 +1,6 @@
 var jsonFile = "../plotly-challenge/samples.json"
 
+//Init
 d3.json(jsonFile).then(function(samples){
     var names = samples.names;
     names.forEach(name => {
@@ -8,6 +9,7 @@ d3.json(jsonFile).then(function(samples){
 
     init(samples);
 });
+
 
 function getSample(samples){
     var sampleID = d3.select("#selDataset").property("value");
@@ -25,6 +27,8 @@ function getMeta(samples){
         metaDiv.append("p")
             .html(`<b>${key}: ${value}</b>`);
     });
+
+
 }
 
 function plotBar(samples){
@@ -48,7 +52,7 @@ function plotBar(samples){
 
     var barData = [barTrace];
 
-    return barData;
+    Plotly.newPlot("bar", barData);
 }
 
 function plotBubble(samples){
@@ -63,34 +67,55 @@ function plotBubble(samples){
             color: sampleData[0].otu_ids,
         },
         text: sampleData[0].otu_labels
-
     };
     
     var bubbleData = [bubbleTrace];
 
-    return bubbleData;
-    
+    Plotly.newPlot("bubble", bubbleData);
 }
 
+function plotGauge(samples){
+
+    var sampleID = d3.select("#selDataset").property("value");
+    var metadata = samples["metadata"].filter(sample => sample.id == sampleID);
+
+    var data = [
+        {
+          domain: { x: [0, 1], y: [0, 1] },
+          value: metadata[0].wfreq,
+          title: { text: "Belly Button Washing Frequency" },
+          type: "indicator",
+          mode: "gauge",
+          gauge: {
+            axis: { range: [0, 9] },
+            steps: [
+              { range: [0, 1], color: "#e0e069" },
+              { range: [1, 2], color: "#cbd665" },
+              { range: [2, 3], color: "#b7cc62" },
+              { range: [3, 4], color: "#a4c160" },
+              { range: [4, 5], color: "#92b65d" },
+              { range: [5, 6], color: "#80ab5a" },
+              { range: [6, 7], color: "#70a058" },
+              { range: [7, 8], color: "#609555" },
+              { range: [8, 9], color: "#518a52" },
+            ]
+          }
+        }
+      ];
+      
+      var layout = { width: 500, height: 450, margin: { t: 0, b: 0 } };
+      Plotly.newPlot('gauge', data, layout);
+}
 
 function init(samples){
-    var barData = plotBar(samples);
-    Plotly.newPlot("bar", barData);
-
-    var bubbleData = plotBubble(samples);
-    Plotly.newPlot("bubble", bubbleData);
-
+    plotBar(samples);
+    plotBubble(samples);
     getMeta(samples);
+    plotGauge(samples);
 }
 
 function optionChanged(){
     d3.json(jsonFile).then(samples =>{
-        var barData = plotBar(samples);
-        Plotly.newPlot("bar", barData);
-    
-        var bubbleData = plotBubble(samples);
-        Plotly.newPlot("bubble", bubbleData);
-    
-        getMeta(samples);
+        init(samples);
     });
 }
