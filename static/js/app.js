@@ -28,7 +28,6 @@ function getMeta(samples){
             .html(`<b>${key}: ${value}</b>`);
     });
 
-
 }
 
 function plotBar(samples){
